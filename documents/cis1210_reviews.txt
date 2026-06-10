@@ -1,0 +1,21 @@
+Course: CIS 1210 - Data Structures and Algorithms
+University: University of Pennsylvania
+Source: Rate My Professors / PennCourseReview
+
+Professor: Rajiv Gandhi
+Rating: 3.8/5
+Review 1: Gandhi is knowledgeable but his lectures can be hard to follow if you're not already somewhat comfortable with the material. He goes very fast on the board and his handwriting is difficult to read. That said, he is very accessible during office hours and will work through problems with you step by step. The curve at the end saved a lot of people.
+
+Review 2: CIS 1210 is a weed-out course no matter who teaches it, but Gandhi makes it survivable. His exams are very proof-heavy — you need to be comfortable with mathematical induction and formal algorithm analysis. Practice problems from the textbook are essential. Do not skip recitations.
+
+Review 3: Gandhi's homeworks are long and sometimes feel disconnected from what was covered in lecture. The TAs grade harshly on style and documentation, not just correctness. Start early and go to TA office hours, not just professor office hours.
+
+Review 4: He posts lecture notes after class which is helpful since it's hard to take notes and follow along at the same time. The midterm was harder than expected based on the practice exam. Final was more fair. Overall a decent experience if you put in the work.
+
+Professor: Chris Callison-Burch
+Rating: 4.6/5
+Review 1: CCB (as students call him) is one of Penn's most beloved professors. His lectures are genuinely exciting — he makes algorithms feel relevant to real AI and NLP problems, not just abstract theory. He is very responsive on Ed Discussion and his feedback on projects is thoughtful. Exams are fair and well-aligned with what he teaches.
+
+Review 2: Callison-Burch brings in guest speakers from industry which makes the course feel very relevant. His homework problems are challenging but interesting. He's clearly enthusiastic about the subject and it's contagious. One of the few CS professors where you actually look forward to lecture.
+
+Review 3: The workload is real but CCB is worth it. His exams focus on understanding and application, not rote memorization. He drops the lowest homework grade which takes a lot of pressure off. Office hours are well-organized and he actually reads every Ed post himself.

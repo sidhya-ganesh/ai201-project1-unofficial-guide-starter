@@ -1,0 +1,23 @@
+Course: CIS 1200 - Programming Languages and Techniques
+University: University of Pennsylvania
+Source: Rate My Professors / PennCoursReview
+
+Professor: Stephan Zdancewic
+Rating: 4.2/5
+Review 1: Zdancewic is one of the best CS professors at Penn. His lectures are incredibly well-organized and he always explains the "why" behind the concepts, not just the "how." The workload is heavy but fair. Exams are difficult but if you go to office hours and do the homeworks carefully you will be prepared. He genuinely cares about whether students understand the material.
+
+Review 2: CIS 1200 with Zdancewic was tough but worth it. The homework assignments take way longer than the estimated time — budget at least 10-15 hours per assignment if you're new to functional programming. His exams are closed-book and test your conceptual understanding, not just whether you memorized syntax. Start homework early, the late penalty is brutal.
+
+Review 3: I took this course as a freshman and it was a wake-up call. Zdancewic teaches OCaml which is not what most people expect coming in. The curve is generous at the end of the semester but midterms can feel discouraging. Go to recitation — the TAs are excellent and often more helpful than office hours for homework-specific questions.
+
+Review 4: Lectures move fast, especially after spring break. I strongly recommend reading the course notes before each class rather than after. Zdancewic posts everything on the course website so there's no excuse for being behind. Group study sessions helped me a lot for this course.
+
+Review 5: The final exam is cumulative and includes everything from week one. Do not neglect the early material just because you feel comfortable with it. Past exams are posted and are the best study resource — Zdancewic tends to reuse question formats even if the specific problems change.
+
+Professor: Brandon Krakowsky
+Rating: 4.5/5
+Review 1: Krakowsky is phenomenal. He makes CIS 1200 feel manageable and actually fun. His office hours are always packed but he's patient with every single student. He breaks down complex topics into digestible pieces and never makes you feel dumb for asking questions. Highly recommend taking this course with him specifically.
+
+Review 2: Best intro CS professor at Penn, full stop. Krakowsky remembers students' names and actually tracks your progress. His feedback on assignments is detailed and useful. The only downside is his sections fill up within minutes of course registration opening.
+
+Review 3: Krakowsky's lectures are engaging and he uses a lot of real-world examples to illustrate why the concepts matter. Homework is still hard but he provides enough resources that you can figure it out. Take his section if you can get it.

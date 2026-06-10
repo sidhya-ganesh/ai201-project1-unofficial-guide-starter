@@ -1,122 +1,91 @@
-# Project 1 Planning: The Unofficial Guide
-
-> Write this document before you write any pipeline code.
-> Your spec and architecture diagram are what you'll use to direct AI tools (Claude, Copilot, etc.) to generate your implementation — the more specific they are, the more useful the generated code will be.
-> Update the Retrieval Approach and Chunking Strategy sections if you change your approach during implementation.
-> Update this file before starting any stretch features.
-
----
+# Planning: The Unofficial Penn Guide
 
 ## Domain
-
-<!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
-
----
+I chose **UPenn professor and course reviews** — student-generated knowledge about professors, exam formats, grading curves, and survival tips across Penn's major introductory courses. This knowledge is valuable because Penn's official sources (course catalog, registrar) tell you nothing about what a professor's exams actually look like, whether there's a curve, or which section to avoid. Students share this knowledge informally through Reddit, Rate My Professors, Discord servers, and class GroupChats — but it's scattered and hard to search systematically.
 
 ## Documents
+10 source documents collected from Rate My Professors, PennCourseReview, and Reddit r/UPenn:
 
-<!-- List your specific sources: URLs, subreddit names, forum threads, or file descriptions.
-     Aim for at least 10 sources that together cover different subtopics or perspectives within your domain. -->
-
-| # | Source | Description | URL or location |
-|---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
-
----
+1. `cis120_reviews.txt` — CIS 1200 reviews for Zdancewic and Krakowsky
+2. `cis1210_reviews.txt` — CIS 1210 reviews for Gandhi and Callison-Burch
+3. `econ100_reviews.txt` — ECON 0100 reviews for Stein and Diebold
+4. `math1400_reviews.txt` — MATH 1400 reviews for Ghrist and Kazdan
+5. `writing_seminar_reviews.txt` — WRIT 0150 general advice and reviews
+6. `psyc001_reviews.txt` — PSYC 0001 reviews for Gelperin and Duckworth
+7. `wharton_mgmt_reviews.txt` — MGMT 1010 reviews for Adam Grant and Siggelkow
+8. `phys150_reviews.txt` — PHYS 0150 reviews for Yodh and Thomson
+9. `hist1600_reviews.txt` — HIST 1600 reviews for Sugrue and Powell
+10. `general_upenn_advice.txt` — General Penn course registration and survival tips
 
 ## Chunking Strategy
+**Chunk size:** Pre-curated focused chunks averaging 150-200 characters each, with no overlap needed since each chunk covers exactly one professor or topic.
 
-<!-- How will you split documents into chunks?
-     State your chunk size (in tokens or characters), overlap size, and explain why those
-     numbers fit the structure of your documents.
-     A review-heavy corpus warrants different chunking than a long FAQ. -->
+My documents are review-style text — short opinion paragraphs averaging 3-5 sentences. Originally I planned 200-character chunks with 30-character overlap using an automated splitter, but due to memory constraints on my local machine I switched to pre-curated chunks. Each chunk is a hand-selected summary of one professor or topic, making every chunk fully self-contained and semantically rich. This actually improves retrieval quality because each embedding carries a clean, focused signal rather than a fragment of a larger review.
 
-**Chunk size:**
-
-**Overlap:**
-
-**Reasoning:**
-
----
+If I were scaling this to thousands of documents I would use the automated chunker with 300-character chunks and 50-character overlap.
 
 ## Retrieval Approach
+**Embedding model:** `all-MiniLM-L6-v2` via sentence-transformers — runs locally, no API key, no rate limits, good semantic performance for English opinion text.
 
-<!-- Which embedding model are you using (e.g., all-MiniLM-L6-v2 via sentence-transformers)?
-     How many chunks will you retrieve per query (top-k)?
-     If you were deploying this for real users and cost wasn't a constraint, what tradeoffs
-     would you weigh in choosing a different embedding model — context length, multilingual
-     support, accuracy on domain-specific text, latency? -->
+**Top-k:** 4 chunks per query. Review text is dense with specific opinions, so 4 chunks gives the LLM enough variety without overwhelming the context window with loosely-related material.
 
-**Embedding model:**
-
-**Top-k:**
-
-**Production tradeoff reflection:**
-
----
+**Production tradeoffs I'd consider:**
+- `text-embedding-3-large` (OpenAI) for higher accuracy but adds cost and API dependency
+- `multilingual-e5-large` if the student body posts reviews in multiple languages
+- Local models avoid rate limits but can't be updated without redeployment
+- Context length matters if documents were longer; for short reviews, MiniLM's 256-token limit is fine
 
 ## Evaluation Plan
+5 test questions with expected answers:
 
-<!-- List your 5 test questions with their expected correct answers.
-     Questions should be specific enough that you can judge whether the system's response
-     is right or wrong. "What are good dining halls?" is too vague.
-     "What do students say about wait times at [dining hall name] during lunch?" is testable. -->
+1. **Q:** What do students say about Professor Ghrist's exams in MATH 1400?
+   **Expected:** Exams are hard but fair, homework is harder than exams, curve applied to final, uses visual/topological approach different from AP Calc.
 
-| # | Question | Expected answer |
-|---|----------|-----------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+2. **Q:** Is there a curve in CIS 1200?
+   **Expected:** Yes — Zdancewic applies a generous curve at the end of the semester, but midterms can feel discouraging.
 
----
+3. **Q:** How useful are office hours at Penn?
+   **Expected:** Highly underused — most professors see very few students outside exam weeks; going regularly helps you stand out and get better help.
+
+4. **Q:** What is Angela Duckworth's class like?
+   **Expected:** High-effort, rigorous readings including primary sources, exams test application not memorization, guest speakers, highly rated (4.9/5).
+
+5. **Q:** How do I get off the waitlist for a Penn course?
+   **Expected:** Show up to the first lecture in person — professors sometimes let in waitlisted students who attend; also use the two-week shopping period.
 
 ## Anticipated Challenges
+1. **Chunk boundary splits:** With automated chunking, a review mentioning both exam format AND grading curve might get split across chunks. The pre-curated approach eliminates this risk for the current corpus.
+2. **Professor name variations:** Students use nicknames (CCB for Callison-Burch) — the embedding model may not link these, causing retrieval to miss relevant reviews when queries use nicknames.
 
-<!-- What could go wrong? Name at least two specific risks with reasoning.
-     Consider: noisy or inconsistent documents, missing source attribution, off-topic
-     retrieval, chunks that split key information across boundaries. -->
-
-1.
-
-2.
-
----
+## AI Tool Plan
+- **Ingestion + chunking:** Prompted Claude with the Documents section and Chunking Strategy → implemented `ingest.py` with `chunk_text()` matching my spec.
+- **Embedding + vector store:** Prompted Claude with the Retrieval Approach section → implemented `embed.py` using sentence-transformers and ChromaDB.
+- **Generation:** Prompted Claude with grounding requirement and output format → implemented `query.py` with strict system prompt enforcing answers from retrieved context only.
+- **Interface:** Prompted Claude with Gradio skeleton → wired to `query.py` ask() function in `app.py`.
 
 ## Architecture
 
-<!-- Draw a diagram of your pipeline showing the five stages:
-     Document Ingestion → Chunking → Embedding + Vector Store → Retrieval → Generation
-     Label each stage with the tool or library you're using.
-     You can use ASCII art, a Mermaid diagram, or embed a sketch as an image.
-     You'll use this diagram as context when prompting AI tools to implement each stage. -->
-
----
-
-## AI Tool Plan
-
-<!-- For each part of the pipeline below, describe:
-     - Which AI tool you plan to use (Claude, Copilot, ChatGPT, etc.)
-     - What you'll give it as input (which sections of this planning.md, which requirements)
-     - What you expect it to produce
-     - How you'll verify the output matches your spec
-
-     "I'll use AI to help me code" is not a plan.
-     "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
-     with my specified chunk size and overlap" is a plan. -->
-
-**Milestone 3 — Ingestion and chunking:**
-
-**Milestone 4 — Embedding and retrieval:**
-
-**Milestone 5 — Generation and interface:**
+```
+Documents (10 .txt files)
+        |
+        v
+[Ingestion + Cleaning]  ← ingest.py (load, strip boilerplate)
+        |
+        v
+[Chunking]              ← pre-curated focused chunks, ~150-200 chars each
+        |
+        v
+[Embedding]             ← all-MiniLM-L6-v2 (sentence-transformers)
+        |
+        v
+[Vector Store]          ← ChromaDB (local, with source metadata)
+        |
+        v
+[Retrieval]             ← top-4 semantic similarity search
+        |
+        v
+[Generation]            ← Groq llama-3.3-70b-versatile
+        |
+        v
+[Query Interface]       ← Gradio web UI (app.py)
+```
