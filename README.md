@@ -1,162 +1,64 @@
-# The Unofficial Guide — Project 1
+# The Unofficial Penn Guide
+A RAG system that makes student-generated knowledge about UPenn courses and professors searchable and answerable.
 
-> **How to use this template:**
-> Complete each section *after* you've built and tested the corresponding part of your system.
-> Do not write placeholder text — if a section isn't done yet, leave it blank and come back.
-> Every section below is required for submission. One-liners will not receive full credit.
+## Domain and Document Sources
+**Domain:** UPenn professor and course reviews — student knowledge about exam formats, grading curves, professor teaching styles, and campus survival tips. This knowledge is valuable because Penn's official sources tell you nothing about whether a curve exists, which section to take, or what professors actually test on. Students share this informally through Reddit, Rate My Professors, and Discord — but it's scattered and hard to search.
 
----
+**Sources:**
+- `cis120_reviews.txt` — Rate My Professors / PennCourseReview: CIS 1200 reviews for Zdancewic and Krakowsky
+- `cis1210_reviews.txt` — Rate My Professors / PennCourseReview: CIS 1210 reviews for Gandhi and Callison-Burch
+- `econ100_reviews.txt` — Rate My Professors / PennCourseReview: ECON 0100 reviews for Stein and Diebold
+- `math1400_reviews.txt` — Rate My Professors / PennCourseReview: MATH 1400 reviews for Ghrist and Kazdan
+- `writing_seminar_reviews.txt` — Reddit r/UPenn: WRIT 0150 general advice
+- `psyc001_reviews.txt` — Rate My Professors / PennCourseReview: PSYC 0001 reviews for Gelperin and Duckworth
+- `wharton_mgmt_reviews.txt` — Reddit r/UPenn / Wharton forums: MGMT 1010 reviews for Grant and Siggelkow
+- `phys150_reviews.txt` — Rate My Professors / PennCourseReview: PHYS 0150 reviews for Yodh and Thomson
+- `hist1600_reviews.txt` — Reddit r/UPenn: HIST 1600 reviews for Sugrue and Powell
+- `general_upenn_advice.txt` — Reddit r/UPenn / Penn Discord: General registration and survival tips
 
-## Domain
+## Chunking Strategy and Reasoning
+**Strategy:** Pre-curated focused chunks averaging 150-200 characters each.
 
-<!-- What topic or category of knowledge does your system cover?
-     Why is this knowledge valuable, and why is it hard to find through official channels?
-     Example: "Student reviews of CS professors at [university] — useful because official
-     course descriptions don't reflect teaching style, exam difficulty, or workload." -->
+Originally planned automated 200-character chunks with 30-character overlap. Due to memory constraints on local hardware during development, switched to pre-curated chunks where each chunk covers exactly one professor or topic. This improved retrieval quality because each embedding carries a clean, focused semantic signal rather than a mid-sentence fragment. For a production system with thousands of documents I would use automated chunking at 300 characters with 50-character overlap.
 
----
+## Sample Chunks
+**Chunk 1** (source: math1400_reviews.txt)
+> Professor Ghrist at Penn teaches MATH 1400. His exams are hard but fair. Homework is harder than exams. The final is curved. He uses visual and topological approaches very different from AP Calculus.
 
-## Document Sources
+**Chunk 2** (source: cis120_reviews.txt)
+> CIS 1200 with Zdancewic has a generous curve at end of semester. Midterms can feel discouraging. The final exam is cumulative. Past exams are the best study resource.
 
-<!-- List every source you collected documents from.
-     Be specific: include URLs, subreddit names, forum thread titles, or file names.
-     Aim for variety — sources that together cover different subtopics or perspectives. -->
+**Chunk 3** (source: general_upenn_advice.txt)
+> Office hours at Penn are the most underused resource. Most professors see very few students outside exam weeks. Going regularly helps you stand out.
 
-| # | Source | Type | URL or file path |
-|---|--------|------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+**Chunk 4** (source: psyc001_reviews.txt)
+> Angela Duckworth teaches PSYC 0001. Her course is rigorous with primary source readings. Exams test application not memorization. She brings world-class guest speakers. Rated 4.9/5.
 
----
-
-## Chunking Strategy
-
-<!-- Describe your chunking approach with enough specificity that someone else could reproduce it.
-     Include:
-     - Chunk size (characters or tokens) and why that size fits your documents
-     - Overlap size and why (or why not) you used overlap
-     - Any preprocessing you did before chunking (e.g., stripping HTML, removing headers)
-     - What your final chunk count was across all documents -->
-
-**Chunk size:**
-
-**Overlap:**
-
-**Why these choices fit your documents:**
-
-**Final chunk count:**
-
----
+**Chunk 5** (source: general_upenn_advice.txt)
+> To get off the waitlist at Penn, show up to the first lecture in person. Professors sometimes let in waitlisted students who attend. Penn has a two week shopping period.
 
 ## Embedding Model
+**Model used:** `all-MiniLM-L6-v2` via sentence-transformers. Runs locally — no API key, no rate limits, no cost.
 
-<!-- Name the embedding model you used and explain your choice.
-     Then answer: if you were deploying this system for real users and cost wasn't a constraint,
-     what tradeoffs would you weigh in choosing a different model?
-     Consider: context length limits, multilingual support, accuracy on domain-specific text,
-     latency, and local vs. API-hosted. -->
+**Production tradeoffs:**
+- `text-embedding-3-large` (OpenAI) would give higher accuracy but adds cost and API dependency
+- `multilingual-e5-large` would support non-English reviews
+- Local models avoid rate limits but require redeployment to update
+- MiniLM's 256-token context limit is fine for short reviews but would be a constraint for longer documents
 
-**Model used:**
+## Retrieval Test Results
 
-**Production tradeoff reflection:**
+**Query 1:** What do students say about Professor Ghrist's exams?
+Top chunks retrieved: math1400_reviews.txt, cis1210_reviews.txt, cis120_reviews.txt, hist1600_reviews.txt
+**Why relevant:** The math1400 chunk directly describes Ghrist's exam style. The other chunks were retrieved because they also discuss exam difficulty and curves — semantically similar language even from different courses.
 
----
+**Query 2:** Is there a curve in CIS 1200?
+Top chunks retrieved: cis1210_reviews.txt, math1400_reviews.txt, cis120_reviews.txt, phys150_reviews.txt
+**Why relevant:** The cis120 chunk directly answers the question. Other chunks retrieved because they also mention curves — the semantic similarity of "curve" language pulls related content.
+
+**Query 3:** How useful are office hours at Penn?
+Top chunks retrieved: general_upenn_advice.txt, math1400_reviews.txt, writing_seminar_reviews.txt
+**Why relevant:** The general_upenn_advice chunk directly addresses office hours. This is the strongest retrieval result — exact topic match with high confidence.
 
 ## Grounded Generation
-
-<!-- Explain how your system enforces grounding — how does it prevent the LLM from answering
-     beyond the retrieved documents?
-     Describe both your system prompt (what instruction you gave the model) and any structural
-     choices (e.g., how you formatted the context, whether you filtered low-relevance chunks).
-     Do not just say "I told it to use the documents" — show the actual instruction or explain
-     the mechanism. -->
-
-**System prompt grounding instruction:**
-
-**How source attribution is surfaced in the response:**
-
----
-
-## Evaluation Report
-
-<!-- Run your 5 test questions from planning.md through your system and record the results.
-     Be honest — a partially accurate or inaccurate result that you explain well is more
-     valuable than a suspiciously perfect result. -->
-
-| # | Question | Expected answer | System response (summarized) | Retrieval quality | Response accuracy |
-|---|----------|-----------------|------------------------------|-------------------|-------------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
-
-**Retrieval quality:** Relevant / Partially relevant / Off-target  
-**Response accuracy:** Accurate / Partially accurate / Inaccurate
-
----
-
-## Failure Case Analysis
-
-<!-- Identify at least one question where retrieval or generation did not work as expected.
-     Write a specific explanation of *why* it failed, tied to a part of the pipeline.
-
-     "The answer was wrong" is not an explanation.
-
-     "The relevant information was split across a chunk boundary, so retrieval returned
-     only half the context — the model didn't have enough to answer correctly" is an explanation.
-
-     "The embedding model treated the professor's nickname as out-of-vocabulary and returned
-     results from an unrelated review" is an explanation. -->
-
-**Question that failed:**
-
-**What the system returned:**
-
-**Root cause (tied to a specific pipeline stage):**
-
-**What you would change to fix it:**
-
----
-
-## Spec Reflection
-
-<!-- Reflect on how planning.md shaped your implementation.
-     Answer both questions with at least 2–3 sentences each. -->
-
-**One way the spec helped you during implementation:**
-
-**One way your implementation diverged from the spec, and why:**
-
----
-
-## AI Usage
-
-<!-- Describe at least 2 specific instances where you used an AI tool during this project.
-     For each: what did you give the AI as input, what did it produce, and what did you
-     change, override, or direct differently?
-
-     "I used Claude to help me code" is not sufficient.
-     "I gave Claude my Chunking Strategy section from planning.md and asked it to implement
-     chunk_text(). It returned a function using a fixed character split. I overrode the
-     chunk size from 500 to 200 because my documents are short reviews, not long guides." -->
-
-**Instance 1**
-
-- *What I gave the AI:*
-- *What it produced:*
-- *What I changed or overrode:*
-
-**Instance 2**
-
-- *What I gave the AI:*
-- *What it produced:*
-- *What I changed or overrode:*
+Grounding is enforced through the system prompt in `query.py`:
